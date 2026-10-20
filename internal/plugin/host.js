@@ -1688,6 +1688,9 @@ async function info(id, key, strict) {
     // tool offered on its Anthropic or Responses API by itself, so a
     // client's web_search goes to it as sent (#2027)
     searches: cfg?.searches === true,
+    // magpie's own field: the models' cost is what the vendor bills, so it
+    // goes before models.dev's price for the same id
+    ownPrices: cfg?.ownPrices === true,
     models: {},
   }
   if (md) for (const m of Object.values(md.models ?? {})) out.models[m.id] = fromModelsDev(md, m)
@@ -1926,6 +1929,7 @@ async function providers({ proxies } = {}) {
       options: optionsOf(a.auth),
       decide: p.decide === true,
       searches: p.searches === true,
+      ownPrices: p.ownPrices === true,
       maxConcurrency: concurrencyOf(a),
       signedIn: keys.length > 0,
       authType: first?.type ?? "",

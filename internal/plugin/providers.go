@@ -129,6 +129,11 @@ type Provider struct {
 	// posts the questions to the provider's own base, at /systemone,
 	// through the plugin's fetch (#1514).
 	Decide bool `json:"decide,omitempty"`
+	// OwnPrices says the cost the plugin gives a model is what its vendor
+	// bills for it: its config hook set ownPrices on the provider. Such a
+	// price goes before models.dev's (Provider.ListPrice in
+	// internal/provider), for a vendor whose tariff is not its maker's.
+	OwnPrices bool `json:"ownPrices,omitempty"`
 	// Searches says the provider's upstream answers a web search tool
 	// offered on its Anthropic or Responses API by itself, as a custom
 	// provider's Searches does (#825): its config hook set searches on it

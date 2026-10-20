@@ -1743,7 +1743,9 @@ var makerCatalogs = sync.OnceValue(func() []string {
 // account is at Anthropic's. A remote magpie's is what that magpie counts
 // the model at, as its list says (remotePrice). A model no catalog prices
 // is at the price its plugin lists it at (pluginListPrice), else, when the
-// plugin says the plan serves it free, costs nothing (pluginFree).
+// plugin says the plan serves it free, costs nothing (pluginFree). A plugin
+// that says its costs are its vendor's own (ownPrices) is priced at them
+// before the catalogs.
 func (p Provider) ListPrice(model string) (catalog.Price, bool) {
 	if pr, ok := p.remotePrice(model); ok {
 		return pr, true
@@ -1760,6 +1762,14 @@ func (p Provider) ListPrice(model string) (catalog.Price, bool) {
 	}
 	if pr, ok := p.grokFastPrice(model); ok {
 		return pr, true
+	}
+	// a plugin that says its costs are its vendor's own (ownPrices) is
+	// priced at them before any catalog; a model it gives no cost goes on
+	// to the catalogs as any other
+	if pp, ok := PluginOf(p.ID); ok && pp.OwnPrices {
+		if pr, ok := p.pluginListPrice(model); ok {
+			return pr, true
+		}
 	}
 	names := pricedNames(model)
 	if p.kimiCodeMember() {
